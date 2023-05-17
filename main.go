@@ -10,6 +10,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	// "os/exec"
+	// "path/filepath"
 	"strings"
 
 	"github.com/makiuchi-d/gozxing"
@@ -28,7 +31,7 @@ func convertPDFToImage(pdfPath string, imagePath string) error {
 	}
 
 	// Define the Ghostscript command to convert PDF to image
-	cmd := exec.Command("gs", "-dQUIET", "-dSAFER", "-dBATCH", "-dNOPAUSE", "-sDEVICE=jpeg", "-r144", "-sOutputFile="+absImagePath, absPDFPath)
+	cmd := exec.Command("gs", "-dQUIET", "-dSAFER", "-dFirstPage=20", "-dLastPage=20", "-dBATCH", "-dNOPAUSE", "-sDEVICE=jpeg", "-r144", "-sOutputFile="+absImagePath, absPDFPath)
 
 	// Execute the Ghostscript command
 	err = cmd.Run()
@@ -39,6 +42,63 @@ func convertPDFToImage(pdfPath string, imagePath string) error {
 	return nil
 
 }
+
+// func convertPDFToImages(pdfPath string, outputDir string) error {
+// 	// Create the output directory if it doesn't exist
+// 	err := os.MkdirAll(outputDir, 0755)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Define the Ghostscript command
+// 	cmd := exec.Command("gs",
+// 		"-sDEVICE=jpeg",
+// 		"-r144",
+// 		"-o",
+// 		fmt.Sprintf("%s/page_%%04d.jpg", outputDir),
+// 		"-dNOPAUSE",
+// 		"-dBATCH",
+// 		pdfPath,
+// 	)
+
+// 	// Set the command's working directory to the output directory
+// 	cmd.Dir = outputDir
+
+// 	// Run the Ghostscript command
+// 	err = cmd.Run()
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
+
+// func convertPDFToImages(pdfPath string, outputDir string) error {
+// 	// Create the output directory if it doesn't exist
+// 	err := os.MkdirAll(outputDir, 0755)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Configure the parameters for PDF to image conversion
+// 	config := pdfcpu.NewDefaultConfiguration()
+
+// 	// Set the input file path
+// 	config.Cmd = pdfcpu.Command{
+// 		InFile: pdfPath,
+// 	}
+
+// 	// Set the output directory path
+// 	config.Cmd.OutDir = outputDir
+
+// 	// Run the PDF to image conversion
+// 	err = api.Process(config)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
 
 func readImage(imagePath string) ([]byte, error) {
 	file, err := os.Open(imagePath)
@@ -87,15 +147,31 @@ func scan(b []byte) (string, string) {
 }
 
 func main() {
-	// pdfPath := "example/APV-122060130-1855.pdf"
-	pdfPath := "example/PV-923050005-3857.pdf"
+	pdfPath := "example/APV-122060130-1855.pdf"
+	// pdfPath := "example/PV-923050005-3857.pdf"
 	imagePath := "image/APV-122060130-1855.jpg"
+
+	// pageCount, err := getPageCount(pdfPath)
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// 	return
+	// }
+
+	// fmt.Println("Number of Pages:", pageCount)
 
 	err := convertPDFToImage(pdfPath, imagePath)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
+
+	// err := convertPDFToImages(pdfPath, "image")
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// 	return
+	// }
+
+	// fmt.Println("PDF converted to images successfully.")
 
 	fmt.Println("PDF converted to image successfully.")
 	b, _ := readImage(imagePath)
